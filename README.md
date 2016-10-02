@@ -1,9 +1,8 @@
 # ocl-examples
-
 A collection of (toy) examples using OCL that demonstrate the use of
 OCL in the context of UML as well as SecureUML models. Most of the
-models were developed in the context of the original HOL-OCL and
-SecureUML.
+models were developed in the context of the HOL-OCL and SecureUML 
+projects.
 
 ## Models
 * **[Company:](./company)** A simple company model, inspired by the OCL standard.
