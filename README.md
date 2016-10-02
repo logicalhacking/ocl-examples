@@ -6,7 +6,7 @@ models were developed in the context of the original HOL-OCL and
 SecureUML.
 
 ## Models
-* **Royals and Loyals:** The famous royals-and-loyals example.
+* **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 
 ## Team
 * [Achim D. Brucker](http://www.brucker.ch/)
