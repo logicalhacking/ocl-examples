@@ -6,6 +6,7 @@ models were developed in the context of the original HOL-OCL and
 SecureUML.
 
 ## Models
+* **[Company:](./company)** A simple company model, inspired by the OCL standard.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Stack:](./stack)** A simple stack.
 
