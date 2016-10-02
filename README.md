@@ -5,6 +5,7 @@ models were developed in the context of the HOL-OCL and SecureUML
 projects.
 
 ## Models
+* **[Calendar:](./calendar)** A simple calendar/meeting model.
 * **[Company:](./company)** A simple company model, inspired by the OCL standard.
 * **[ISP:](./isp)** A simple example of an ISP.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
