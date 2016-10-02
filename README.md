@@ -5,6 +5,9 @@ OCL in the context of UML as well as SecureUML models. Most of the
 models were developed in the context of the original HOL-OCL and
 SecureUML.
 
+## Models
+* **Royals and Loyals:** The famous royals-and-loyals example.
+
 ## Team
 * [Achim D. Brucker](http://www.brucker.ch/)
 
