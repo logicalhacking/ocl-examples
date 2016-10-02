@@ -9,7 +9,7 @@ SecureUML.
 * [Achim D. Brucker](http://www.brucker.ch/)
 
 ## License
-This project is licensed under the Apache License Version 2.0.
+This project is licensed under a 2-clause BSD license. 
 
 ## Publications
 * Achim D. Brucker and Burkhart Wolff. [Semantics, Calculi, and Analysis
