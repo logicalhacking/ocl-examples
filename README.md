@@ -7,6 +7,7 @@ SecureUML.
 
 ## Models
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
+* **[Stack:](./stack)** A simple stack.
 
 ## Team
 * [Achim D. Brucker](http://www.brucker.ch/)
