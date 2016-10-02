@@ -7,6 +7,7 @@ SecureUML.
 
 ## Models
 * **[Company:](./company)** A simple company model, inspired by the OCL standard.
+* **[ISP:](./isp)** A simple example of an ISP.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Stack:](./stack)** A simple stack.
 

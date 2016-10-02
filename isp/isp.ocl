@@ -1,0 +1,108 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+
+package ISP
+--
+-- Consitency
+-- ==========
+
+-- For the service ``1GB'' the free download variable should be
+-- invariant and be set to 1.
+context Max1GB
+  inv : self.oclAsType(ISP.Service).freedownload = 1024
+-- [Enc] inv : self.freedownload = 1024
+
+
+-- A customer can only have a service from his service provider
+context Provider
+  inv onlyOfferedService: self.services->includesAll(self.customer
+                             ->collect(c:Customer | c.service)->asSet())
+
+-- If the download rate of a customer (in Surf-Record) is lower than the
+-- freedownload of his service, then the amount_of_money in his bill is
+-- equal to the price in the service.
+context Bill
+  inv: self.surfRecord.downloadRate <= self.service.freedownload
+      implies self.amount = self.service.price
+ 
+-- If the bill has not been paid for 30 days, the customer's flag active
+-- will be set to false
+context Customer
+  inv: self.bill.send_date.durationInDays(self.bill.paid_date.today()) > 30 
+       and
+       self.bill.send_date.durationInDays(self.bill.paid_date) > 30
+       implies not self.active 
+
+
+-- 
+-- 
+context SurfRecord::setRate(rate:Integer):Integer
+  pre: true
+  post: (result = if rate > downloadRate then rate
+  	         else downloadRate endif)
+        and
+        (rate > downloadRate implies downloadRate = rate)
+	and 
+        (rate <= downloadRate implies downloadRate = downloadRate@pre)
+
+--
+-- 
+context Customer
+-- [Enc]  inv: self.allInstances()->isUnique(self.id)
+  inv: self.allInstances()->forAll(
+      c1:Customer, c2:Customer | c1.id = c2.id implies c1 =c2)
+
+--  
+-- 
+context Provider::reenableCustomer(c:Customer):void
+  pre:   not c.active
+  post:  c.active  
+ 
+--
+-- Security
+-- ==========
+--
+--
+context Customer::changeService(s:Service):Boolean
+  pre perm0:  s.customer.oclAsType(oclLib.OclAny) = environment.caller.oclAsType(oclLib.OclAny) 
+--   pre perm0:  s.customer  = environment.caller 
+
+--
+-- A customer can only view his own downloadrate
+context SurfRecord::getRate():Integer
+  pre perm1:  environment.caller.oclAsType(oclLib.OclAny) = self.customer.oclAsType(oclLib.OclAny)
+--  pre perm1:  environment.caller = self.customer
+
+--
+context SurfRecord::setRate(rate:Integer):Integer
+  pre perm2: environment.caller.role = 'Provider'
+
+--
+context Bill::confirm_payment():Boolean
+  pre prem3: environment.caller.role = 'Provider'
+
+endpackage
