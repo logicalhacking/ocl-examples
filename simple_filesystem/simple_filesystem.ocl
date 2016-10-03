@@ -1,0 +1,125 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+
+package simple_filesystem
+  -------------------------------------------------------------------
+  -- File                                                          --
+  -------------------------------------------------------------------
+  context File
+        inv: File::allInstances()->isUnique(x | x.name)
+
+  context File::HasAccess(uid:UID, groups:Set(GROUPID),
+                          p : Permission) : Boolean
+  post: if    owner = uid 
+        then result = perm.owner->includes(p)
+        else  if groups->includes(group) 
+                then result = perm.group->includes(p)
+                else result = perm.world->includes(p)                               
+                                              
+
+
+  -------------------------------------------------------------------
+  -- User                                                          --
+  -------------------------------------------------------------------
+  context User
+         inv: User::allInstances()->forall(x, y |
+                        x.uid = y.uid implies x.groups = y.groups)
+
+  context User :: create(n:String)
+       post: result = File::allInstances@pre()->forall(x | x.name<>n)
+       post: File::allInstances()->exists(x | x.name=n)
+       post: result implies File::allInstances()->exists(x | 
+                      x.name=n and  x.isNewInState() and 
+                      x.owner = self.uid and self.groups->includes(x.group) and
+                      x.content = Sequence{} )
+       post: not result implies File::allInstances()->exists(x | 
+                      x.name=n and  not x.isNewInState and 
+                      x.owner=x.owner@pre and x.group=x.group@pre and
+                      x.content = x.content@pre)                                      
+       
+         
+  context User :: open(n:String, w:Boolean):Boolean
+       post: res :  result  = File::allInstances()->exists(x | x.name=n)  
+       post: write: result and w implies
+                      if has_access(n, W) then 
+                           self.curr_fd.isNewInState() and
+                           self.curr_fd.openForWrite and
+                           self.curr_fd.position=0
+                      else self.curr_fd = null
+       post: read:  result and not w implies
+                      if has_access(n, R) then 
+                           self.curr_fd.isNewInState() and
+                           not self.curr_fd.openForWrite and
+                           self.curr_fd.position=0
+                      else self.curr_fd = null
+       post: error: not result implies self.curr_fd = null
+
+
+  context User:: execute(n:String)
+       pre:  has_access(n, X)
+       post: true   -- anything is possible       
+                    -- could be extended to a "deep"
+                    -- security property in form of a
+                    -- framing property: anything can change
+                    -- to which the user has access.
+       
+  context User :: close()
+       pre:  curr_fd <> null
+       post: curr_fd = null       
+       
+  context User :: appendline(line:String)
+       pre:  curr_fd <> null and curr_fd.openForWrite
+       post: curr_fd.file.content = curr_fd.AppendLine(line) 
+         and curr_fd.openForWrite = curr_fd.openForWrite@pre
+         and curr_fd.position = curr_fd.position@pre + 1
+
+  context User :: readline(line):String
+       pre:   curr_fd <> null and not curr_fd.openForWrite
+       post:  result = curr_fd.Readline(line) 
+         and  curr_fd.openForWrite = curr_fd.openForWrite@pre
+         and  curr_fd.position = curr_fd.position@pre + 1
+
+  context User :: updateline(line:String, no:Integer)
+       pre:   curr_fd <> null and curr_fd.openForWrite
+       post:  curr_fd.file.content = curr_fd.Updateline(line,no) 
+         and  curr_fd.openForWrite = curr_fd.openForWrite@pre
+         and  curr_fd.position = curr_fd.position@pre + 1
+       
+  context User :: has_access(n:String,p:Permission) : Boolean
+       post: result = File::allInstances->exists(x | x.name = n and
+                                             x.HasAccess(uid,groups,p))
+                                                                   
+  context User :: chmod(n:String, w:Set(Permission), 
+                                  g:Set(Permission),
+                                  o:Set(Permission))
+       pre:  File::allInstances->exists(x | x.name = n and
+                                          x.HasAccess(uid,groups,W))
+       post: File::allInstances->select(x | x.name=n).perm.world=w 
+        and  File::allInstances->select(x | x.name=n).perm.group=g 
+        and  File::allInstances->select(x | x.name=n).perm.owner=o                                                                                               
+                                                                   
+endpackage

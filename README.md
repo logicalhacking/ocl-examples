@@ -14,8 +14,11 @@ projects.
 * **[ISP:](./isp)** A simple example of an ISP.
 * **[Mini Company:](./mini_company)** A tiny company example modelling a management hierarchy.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
+* **[Simple Filesystem:](./simple_filesystem)** A simple POSIX-like fileystem model.
 * **[Stack:](./stack)** A simple stack.
 * **[Vehicles:](./vehicles)** A simple modle of vehicles and driver's licenses.
+
+
 
 ## Team
 * [Achim D. Brucker](http://www.brucker.ch/)
