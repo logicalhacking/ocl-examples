@@ -5,6 +5,7 @@ models were developed in the context of the HOL-OCL and SecureUML
 projects.
 
 ## Models
+* **[Controller Calendar:](./controller_calendar)** A simple calendar/meeting model using ControllerUML.
 * **[Calendar:](./calendar)** A simple calendar/meeting model.
 * **[Company:](./company)** A simple company model, inspired by the OCL standard.
 * **[Digraph:](./digraph)** A simple tree like (recursive) data structure.
