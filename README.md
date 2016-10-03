@@ -8,6 +8,7 @@ projects.
 * **[Calendar:](./calendar)** A simple calendar/meeting model.
 * **[Company:](./company)** A simple company model, inspired by the OCL standard.
 * **[E-Bank:](./ebank)** A simple eBank/Accounting model.
+* **[Health System:](./health_system)** A simple health system.
 * **[ISP:](./isp)** A simple example of an ISP.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Stack:](./stack)** A simple stack.
