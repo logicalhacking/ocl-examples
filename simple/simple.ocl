@@ -1,0 +1,193 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+--  
+
+-- Testing OCL syntax variations
+-- 
+package simple
+  -- testing implicit self 
+  -- =====================
+  context A
+    inv self_short: i = 5			
+    inv self_long:  self.i = 5			
+    inv: self.i=self.attribB.attribA.i
+    inv: i = attribB.attribA.i
+    inv iskind:  self.oclIsKindOf(simple.A)
+    inv meth: self.m(1) > 5
+    inv meth2: self.m(self.i) > 5
+    inv real: r = 2.45
+    inv: not Set{1,2,3,4,5} ->isEmpty()
+--    inv: Set{} ->isEmpty()
+
+
+  context B
+    inv constant: self.j = 42
+    inv iskind:  not self.oclIsKindOf(simple.A)
+    inv istype:  self.oclIsTypeOf(simple.B)
+  
+  context C
+    inv cast: self.oclAsType(simple.A).oclIsTypeOf(simple.A)
+
+  -- testing named self 
+  -- ==================
+  -- not supported by dresden-ocl (parser-bug?)
+  -- ( Cannot parse OCL constraint: expecting: 'derive', 'init')
+  -- context foo:A 
+  --   inv named_self_short: i=5       -- Dresden 
+  --   inv named_self_foo:  foo.i=5    -- Dresden
+
+  -- ->size() on non-collection types
+  -- ================================
+-- [Dresden] context A
+-- [Dresden] inv: self.i->size() > 0 
+
+  -- implicit ->asSet()
+  -- ==================
+-- [Dresden]  context A
+-- [Dresden]    inv setshort: self.i->size() > 0          
+-- [Dresden]    inv set_long: self.i->asSet()->size() > 0  
+-- [Dresden] inv intAsSet:    1->asSet()->includes(1)
+-- [Dresden]     inv intInclude:  1->includes(1)
+-- [Dresden]    inv intSizew:    1->size() > 0
+-- [Dresden]    inv inc: self.i ->includes(4)         
+
+
+  -- Operations: pre/post
+  -- ==============================
+  context A::m(p:Integer):Integer
+    pre: p > 0 
+    post: (result = 0 - p)   and  p > (0-5)
+
+  -- Operations: @per
+  -- ==============================
+  context A::m(p:Integer):Integer                
+    post pre1: self = self@pre                     
+    post pre2: p = i@pre - 5                       
+    post pre3: self.i=self.attribB.attribA.i@pre   
+    post pre4: self.i=self.attribB.attribA@pre.i   
+    post pre5: self.i=self.attribB@pre.attribA.i   
+    post pre6: self.i=self@pre.attribB.attribA.i   
+
+
+  -- syntactical variants of iterate/forall
+  -- ======================================
+  context B
+   inv forall:       self.a->forAll(a:A  | a.i = 5)
+   inv twoforall:    self.a->forAll(a:A, b:A | a.i = b.i)
+   inv existential:  self.a->exists(a:A | a.i = 5)
+
+
+  -- shorthand for collect [omg:ocl:2003, p27]
+  -- =========================================
+  -- context B
+    -- inv collect_short: self.a.i = Set{5}              -- Dresden
+    -- inv collect_long:  self.a ->collect(i) = Set{5}   -- Dresden
+    -- inv collect_test:  self.a.i = 5                   -- Dresden       
+    -- inv collect_test2:  self.a->collect(i) = 5         -- Dresden     
+    -- inv strange_collect: self.a->size() = 1 implies self.a.i=5  -- Dresden
+
+  -- access to top-level path-expressions
+  -- ====================================
+  -- context B               -- Dresden  
+  --  inv: simple::A.i = 5  -- Dresden	 
+
+  -- types of overloaded infix operations
+  -- ====================================
+  context A
+    inv: r     = 1.0    
+    inv: i + r = 10     
+    inv: i + r = 10.0   
+    inv: r     = 10.0   
+    inv: r     = 10     
+  
+  -- @pre for method calls
+  -- =====================
+  context A::m(p:Integer):Integer 
+    post: self.m(4)=5      -- Dresden
+    post: self@pre.m(4)=5  -- Dresden
+    post: self.m@pre(4)=5  -- Dresden
+ 
+  -- body vs. post
+  -- =============
+  context A::m(p:Integer):Integer   
+    body testbody: p 
+
+  -- body (recursive)
+  -- ================
+  -- context A::m(p:Integer):Integer -- Dresden/HOL-OCL
+  --   body: p * m(p-1)              -- Dresden/HOL-OCL
+
+
+  -- init:
+  -- =====
+  context A::i : Integer  
+    init:  0                     
+
+  -- def (attributes):
+  -- =================
+  -- should be transformed into the UML model
+  -- context A                      
+  -- def: s:String=''               -- Dresden (HOL-OCL)
+
+  -- def (method):
+  -- =================
+  -- should be transformed into the UML model
+  -- context A                 
+  -- def: fac(n:Integer):Integer = n fac(n-1)  -- Dresden (HOL-OCL)
+
+  -- derive:
+  -- =======
+  -- (transformation into UML model)
+  -- (derive (attributes) ~~> invariants (class))?
+  -- context A.r
+  -- derive: i                      -- Dresden (HOL-OCL)
+     
+
+  -- oclAsType (explicit overriding):
+  -- ================================
+  -- context D
+  -- inv: self.oclAsType(A).r = 0  -- Dresden (HOL-OCL)
+
+
+  -- let expressions
+  -- ===============
+  context A::m(p:Integer):Integer      
+    pre: let foo:Integer = p+5 in  foo > 0  
+ 
+
+  -- operations on sets
+  -- ==================
+  context B
+    inv mt: self.a->isEmpty()
+    inv full: self.a->notEmpty()
+    inv un: self.a->union(self.a) = self.a
+    inv inter: self.a->intersection(self.a) = self.a 
+
+
+endpackage
+  
+ 
