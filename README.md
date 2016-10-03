@@ -16,7 +16,7 @@ projects.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Simple Filesystem:](./simple_filesystem)** A simple POSIX-like fileystem model.
 * **[Stack:](./stack)** A simple stack.
-* **[Vehicles:](./vehicles)** A simple modle of vehicles and driver's licenses.
+* **[Vehicles:](./vehicles)** A simple model of vehicles and driver's licenses.
 
 
 
