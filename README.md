@@ -12,6 +12,7 @@ projects.
 * **[ISP:](./isp)** A simple example of an ISP.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Stack:](./stack)** A simple stack.
+* **[Vehicles:](./vehicles)** A simple modle of vehicles and driver's licenses.
 
 ## Team
 * [Achim D. Brucker](http://www.brucker.ch/)
