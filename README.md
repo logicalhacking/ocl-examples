@@ -7,6 +7,7 @@ projects.
 ## Models
 * **[Calendar:](./calendar)** A simple calendar/meeting model.
 * **[Company:](./company)** A simple company model, inspired by the OCL standard.
+* **[Digraph:](./digraph)** A simple tree like (recursive) data structure.
 * **[E-Bank:](./ebank)** A simple eBank/Accounting model.
 * **[Health System:](./health_system)** A simple health system.
 * **[ISP:](./isp)** A simple example of an ISP.
