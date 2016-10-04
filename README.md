@@ -16,9 +16,11 @@ projects.
 * **[Priority Queue:](./priority_queue)** A simple priority queue model.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Simple:](./simple)** A very simple toy example showing a few OCL syntax variations.
+* **[Simple Chair:](./simple_chair)** A simple conference management system.
 * **[Simple Filesystem:](./simple_filesystem)** A simple POSIX-like fileystem model.
 * **[Stack:](./stack)** A simple stack.
 * **[Vehicles:](./vehicles)** A simple model of vehicles and driver's licenses.
+
 
 ## Team
 * [Achim D. Brucker](http://www.brucker.ch/)

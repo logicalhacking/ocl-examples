@@ -1,0 +1,78 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+package AbstractSimpleChair03
+
+  context Person
+    inv:  name <> ''
+
+  context Session
+    inv onlyOneChair: 
+        self.participants->one( p:Participant | 
+                                       p.role.oclIsTypeOf(AbstractSimpleChair03.Chair))
+
+  context Session::invite(p:Person, r:Role):OclVoid
+    pre:  not self.participants->forAll(participant:Participant |
+                               participant.person->excludes(p) and 
+                               participant.role->excludes(r))
+    post: self.participants->one(participant:Participant |
+                                 participant.person->includes(p) and 
+                                 participant.role->includes(r))
+
+
+  context Session::findRole(p:Person):Role
+    pre:  self.participants.person->includes(p)
+     post: result=self.participants->select(par:Participant |
+                                      par.person->includes(p)).role 
+
+  -- constraints describing the semantics of an association class
+  -- in terms of a ternary association:
+  context Participant
+    inv AssociationClassInjective:
+         Participant::allInstances()->forAll( p: Participant |
+           ( self.role = p.role and self.person = p.person )
+               implies self = p ) 
+    -- could be expressed as multiplicity in the diagram:
+    inv oneRolePerParticipant:   role->size() = 1 
+    -- could be expressed as multiplicity in the diagram:
+    inv onePersonPerParticipant: person->size() = 1
+
+  -- constraints describing the semantics of tenary associations
+  -- in terms of binary associations
+  context Participant
+    inv:  self.person.role = self.role 
+    inv:  self.role.person = self.person
+
+  context Person
+    inv:  self.participant.role = self.role 
+    inv:  self.role.participant = self.participant
+
+  context Role
+    inv:  self.participant.person = self.person 
+    inv:  self.person.participant = self.participant
+
+endpackage 
+

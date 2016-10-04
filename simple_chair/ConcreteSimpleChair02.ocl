@@ -1,0 +1,64 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+package ConcreteSimpleChair02
+
+  context Person
+    inv:  name <> ''
+
+  context Session
+    inv onlyOneChair: 
+        self.roles->one( r:Role| r.oclIsTypeOf(ConcreteSimpleChair02.Chair))
+
+ context Session::invite(p:Person,r:Role):OclVoid
+    pre:  not self.participants->includes(p)
+    post:     self.participants = self.participants@pre->append(p)
+          and self.roles = self.roles@pre->append(r)
+
+  context Session::findRole(p:Person):Role
+    pre:  self.participants->includes(p)
+--    post: result = roles->at(participants->indexOf(p))
+
+  context Session
+    inv: participants.size() = roles.size()
+
+  -- constraints describing the semantics of associations in 
+  -- terms of attributes
+  -- - SessionRole 
+  context Session 
+    inv:  self.roles->forAll(r:Role | r.sessions->includes(self))
+
+  context Role
+    inv:  self.sessions->forAll(s:Session | s.roles->includes(self))
+
+  -- - SessionPersion
+  context Session
+    inv:  self.participants->forAll(p:Person | p.sessions->includes(self))
+   context Person
+     inv:  self.sessions->forAll(s:Session | s.participants->includes(self))
+
+endpackage 
+

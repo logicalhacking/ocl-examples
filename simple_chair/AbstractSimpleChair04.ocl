@@ -1,0 +1,95 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+package AbstractSimpleChair04
+
+  context Person
+    inv:  name <> ''
+
+  context Session
+   inv onlyOneChair: 
+        self.participants->one( p:Participant | 
+                                       p.role.oclIsTypeOf(AbstractSimpleChair04.Chair))
+
+-- --   context Session::invite(p:Person, r:Role):OclVoid
+-- --     pre:  not self.participants->forAll(participant:Participant |
+-- --                                participant.person <> p and 
+-- --                                participant.role <> r)
+-- --     post: self.participants->one(participant:Participant |
+-- --                                   participant.person=p and 
+-- --                                   participant.role=r)
+
+  context Session::findRole(p:Person):Role
+    pre:  self.participants->collect(par:Participant | par.person)->includes(p)
+--     post: result=self.participants->select(par:Participant |
+--                                        par.person->includes(p) ).role 
+
+  -- constraints describing the semantics of an association class
+  -- in terms of a ternary association:
+  context Participant
+    inv AssociationClassInjective:
+         Participant::allInstances()->forAll( p: Participant |
+           ( self.role = p.role and self.person = p.person )
+               implies self = p ) 
+  -- already expressed as multiplicity in the diagram:
+  inv oneRolePerParticipant:   role->size() = 1 
+  -- already expressed as multiplicity in the diagram:
+  inv onePersonPerParticipant: person->size() = 1
+
+  -- constraints describing the semantics of tenary associations
+  -- in terms of binary associations
+  context Participant
+    inv:  self.person->collect(p:Person | p.role)->includesAll(self.role) 
+    inv:  self.role->collect(r:Role | r.person)->includesAll(self.person) 
+
+  context Person
+    inv:  self.participant->collect(p:Participant | p.role)->includesAll(self.role) 
+    inv:  self.role->collect(r:Role | r.participant)->includesAll(self.participant) 
+
+  context Role
+    inv:  self.participant->collect(p:Participant | p.person)->includesAll(self.person) 
+    inv:  self.person->collect(p:Person | p.participant)->includesAll(self.participant) 
+
+  -- constraints describing the semantics of associations in 
+  -- terms of attributes
+  -- - PersonRole 
+  context Person
+    inv:  self.role->forAll(r:Role | r.person->includes(self))
+  context Role
+    inv:  self.person->forAll(p:Person | p.role->includes(self))
+  -- - PersonParticpant
+  context Person
+    inv:  self.participant->forAll(p:Participant | p.person->includes(self))
+  context Participant
+    inv:  self.person->forAll(p:Person | p.participant->includes(self))
+  -- - ParticipantRole
+  context Participant
+    inv:  self.role->forAll(r: Role | r.participant->includes(self))
+  context Role
+    inv:  self.participant->forAll(p:Participant | p.role->includes(self))
+
+endpackage 
+
