@@ -1,0 +1,121 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+
+package PriorityQueue
+
+  -------------------------------------------------------------------
+  -- Data                                                          --
+  -------------------------------------------------------------------
+  context Data
+    inv: true
+
+  -------------------------------------------------------------------
+  -- ListNode                                                      --
+  -------------------------------------------------------------------
+  context ListNode
+    def: successors(nodes:Set(ListNode)):Set(ListNode) 
+          = if nodes->includes(self) or next.oclIsUndefined()
+              then nodes   
+              else next.successors(nodes->including(self))
+            endif
+
+   context ListNode::successors(nodes:Set(ListNode)):Set(ListNode) 
+     post isQuery:  Set{}->modifiedOnly()
+
+   context ListNode
+     def: toSet() : Set(ListNode) = self.successors(Set{})
+
+   context ListNode::toSet():Set(ListNode)
+     post isQuery: Set{}->modifiedOnly()
+
+   context ListNode
+     inv sizeDefined: data.oclIsDefined()  -- is data.size() = 1
+     inv isPositive: priority > 0
+     inv monotonicity: next.oclIsDefined() implies priority < next.priority
+     -- the following two invariants should follow directly from monotonicity
+     -- and are therefore not neccessary
+     --  inv acyclic: next.oclIsDefined() implies not next.toSet()->includes(self) 
+     --  inv: self.toSet()->forAll(n:ListNode | 
+     --            self <> n implies self.priority <> n.priority)
+
+context ListNode::ListNode(priority:Integer, data:Data, next:ListNode):OclVoid
+     pre:  next.oclIsUndefined or priority < next.priority
+     post: self.priority =3D priority and self.data=3Ddata and self.next=3Dnext
+     post modifies: Set{self}->modifiedOnly()
+
+  context ListNode::ListNode(priority:Integer, data:Data, next:ListNode):OclVoid
+    pre:  true
+     post: self.toSet()->IncludeAll(next.toSet())
+        and self.toSet()->exists(l:ListNode|l.priority = priority and l.data=data)
+        and next.toSet()->IncludeAll(next.toSet()->select(l:ListNode | l.priority <> priority or l.data<>data))
+     post modifies: self.toSet()->modifiedOnly()
+
+
+  -------------------------------------------------------------------
+  -- Queue                                                         --
+  -------------------------------------------------------------------
+  context Queue
+    inv: true
+
+   -- insert node into queue, if a node with same priority exist,
+   -- its data will be replaced 
+   context Queue::insertNode(priority:Integer, data:Data):OclVoid
+     pre:  priority > 0 and data.oclIsDefined()
+    post: first.oclIsDefined() 
+           and first.toSet()->exists(n:ListNode | n.priority = priority and n.data=data)
+     post modifies: 
+          let 
+            predecessor:ListNode =
+                          if first.oclIsDefined() then
+                             if self.first.priority = priority
+                             then Set{}
+                             else first.toSet()->select(n:ListNode |
+                                                        n.next.priority=priority and
+                                                        n.next.oclIsDefined())
+                             endif
+                          else Set{self} endif
+          in  Set{predecessor}->modifiedOnly()
+
+   -- remove top node from queue
+   context Queue::removeTop():OclVoid
+     pre:  not self.isEmpty()
+     post: first=first@pre.next
+     post modifies: Set{self.first}->modifiedOnly()
+
+  -- get data of top node 
+   context Queue::getTop():Data
+     pre:  not self.isEmpty()
+    post: result=first.data
+     post isQuery: Set{}->modifiedOnly()
+
+   -- get data of top node 
+   context Queue::isEmpty():Boolean
+     pre:  true
+     post: first.oclIsUndefined()
+     post isQuery: Set{}->modifiedOnly()
+
+endpackage
