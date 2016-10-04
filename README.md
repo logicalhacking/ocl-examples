@@ -11,6 +11,7 @@ projects.
 * **[Digraph:](./digraph)** A simple tree like (recursive) data structure.
 * **[E-Bank:](./ebank)** A simple eBank/Accounting model.
 * **[Health System:](./health_system)** A simple health system.
+* **[Invoicing Orders:](./invoicing_orders)** A simple invoicing model.
 * **[ISP:](./isp)** A simple example of an ISP.
 * **[Mini Company:](./mini_company)** A tiny company example modelling a management hierarchy.
 * **[Priority Queue:](./priority_queue)** A simple priority queue model.
@@ -20,7 +21,6 @@ projects.
 * **[Simple Filesystem:](./simple_filesystem)** A simple POSIX-like fileystem model.
 * **[Stack:](./stack)** A simple stack.
 * **[Vehicles:](./vehicles)** A simple model of vehicles and driver's licenses.
-
 
 ## Team
 * [Achim D. Brucker](http://www.brucker.ch/)
