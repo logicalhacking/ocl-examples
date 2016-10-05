@@ -35,7 +35,6 @@ context Stack::pop(): Stack
 context Stack::top(): ElemType
     pre   notEmpty: isEmpty() = false
     post: result = elements->first()
---    post: self=self@pre
  
 context Stack::push(e: ElemType): Stack
     post pushedElemTypeIsOnTop: top() = e
