@@ -37,17 +37,5 @@ package companyPackage
   context Employee
     inv atLeastOneEmployee: self.allInstances()->notEmpty()
 
-
---  context Manager
---    def: closureWorksFor(S:Set(Manager)) : Set(Manager) = 
---         worksFor->union((worksFor - S)->collect(m | 
---                    m.closureWorksFor(S->union(worksFor))))
-
-
-
---  context Manager
---    inv: not self.closureWorksFor(Set{})->includes(self)
-	
- --     worksFor->union((worksFor - S)->closureWorksFor(S->union(worksFor)))
 endpackage
 
