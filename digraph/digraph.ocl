@@ -30,15 +30,15 @@ package digraph
 context Node 
 inv: self.i > 5 
 
--- context Node::depth():Integer
--- pre: true
--- post: result = (let 
---                  ldepth:Integer 
--- 		   = if left.oclIsUndefined() then 0 else left.depth() endif,
--- 	         rdepth:Integer
--- 		   = if right.oclIsUndefined() then 0 else right.depth() endif
---	         in
---	           ldepth.max(rdepth)+1)
+context Node::depth():Integer
+pre: true
+post: result = (let 
+                 ldepth:Integer 
+		   = if left.oclIsUndefined() then 0 else left.depth() endif,
+	         rdepth:Integer
+		   = if right.oclIsUndefined() then 0 else right.depth() endif
+              in
+	           ldepth.max(rdepth)+1)
 
 context Cnode
 inv: not self.oclAsType(digraph.Node).left.oclIsUndefined() 
