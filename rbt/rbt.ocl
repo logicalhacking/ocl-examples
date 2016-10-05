@@ -1,0 +1,76 @@
+-- Copyright (c) 2003-2007 ETH Zurich, Switzerland
+--                    2016 The University of Sheffield, UK
+-- 
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright notice, this
+--   list of conditions and the following disclaimer.
+-- 
+-- * Redistributions in binary form must reproduce the above copyright notice,
+--   this list of conditions and the following disclaimer in the documentation
+--   and/or other materials provided with the distribution.
+-- 
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+-- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+-- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+-- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+-- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+-- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+-- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+
+package rbt	    
+	
+  context RBTree 
+    inv wff:    not left.oclIsInvalid() and not right.oclIsInvalid()
+
+    inv redinv: color implies 
+                 ((left = null or not left.color)
+                   and (right = null or not right.color))
+
+    inv ordinv: (left = null or left.max() < key)
+
+    inv balinv: black_depth(left) = black_depth(right)
+
+  context RBTree::min(tree: RBTree):Integer
+    pre: tree<>null
+    post: isMember(tree, result) and
+          Integer::allInstances()->forAll(m:Integer | 
+	                           isMember(tree, m) implies result<=m)
+
+  context RBTree::max(tree: RBTree):Integer
+    pre: tree<>null
+    post: isMember(tree, result) and
+          Integer::allInstances()->forAll(m:Integer | 
+	                           isMember(tree, m) implies m<=result)
+
+ context RBTree::black_depth(tree: RBTree):Integer
+    pre: true
+    post: (tree = null and result = 0)
+          or (tree.left.color and result = black_depth(tree.left))
+          or (not tree.left.color and result = black_depth(tree.left) + 1)
+
+  context RBTree::isMember(tree: RBTree, a:Integer):Boolean
+    pre: true
+    post: result = tree <> null and (a = tree.key or isMember(tree.left, a) or isMember(tree.right, a))
+
+  context RBTree::insert(tree: RBTree, k : Integer):
+    pre:  tree <> null 
+    post: isMember(tree, k) and
+          Integer::allInstances()->forAll(m:Integer | m = k 
+	                        or (isMember(tree, m) = isMember@pre(tree, m)))
+
+  context RBTree::insertFail(tree: RBTree, k : Integer):
+    pre:  tree <> null 
+    post: isMember(tree, k) and
+          Integer::allInstances()->forAll(m:Integer | m = k 
+	                        or (isMember(tree, m) = isMember@pre(tree, m)))
+
+
+endpackage

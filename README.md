@@ -15,6 +15,7 @@ projects.
 * **[ISP:](./isp)** A simple example of an ISP.
 * **[Mini Company:](./mini_company)** A tiny company example modelling a management hierarchy.
 * **[Priority Queue:](./priority_queue)** A simple priority queue model.
+* **[Red-Black-Tree:](./rbt)** A UML/OCL model of red-black-trees.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Simple:](./simple)** A very simple toy example showing a few OCL syntax variations.
 * **[Simple Chair:](./simple_chair)** A simple conference management system.
