@@ -68,60 +68,60 @@ context Transaction::makeTransfer():Boolean
 --
 -- Class BankAccount
 --------------------
--- [Dresden] context BankAccount 
--- [Dresden]  inv:  BankAccount.allInstances->forAll(a1,a2 | a1<>a2 implies 
--- [Dresden]                                 a1.accountNumber <> a2.accountNumber)
--- [Dresden]       -- alternative: Account.allInstances->isUnique(accountNumber)
---
--- [Dresden] context BankAccount::getBalance():Integer
--- [Dresden]   post: result=balance
+context BankAccount 
+ inv:  BankAccount.allInstances->forAll(a1,a2 | a1<>a2 implies 
+                                a1.accountNumber <> a2.accountNumber)
+      -- alternative: Account.allInstances->isUnique(accountNumber)
 
--- [Dresden] context BankAccount::getCurrency():String
--- [Dresden]  post: result=currency
+context BankAccount::getBalance():Integer
+  post: result=balance
 
--- [Dresden] context BankAccount::makeDeposit(amount:Integer):Boolean
--- [Dresden]    post: balance = balance@pre + amount
+context BankAccount::getCurrency():String
+ post: result=currency
 
--- [Dresden] context BankAccount::makeWithdrawal(amount:Integer):Boolean
--- [Dresden]  post: balance = balance@pre - amount
--- [Dresden]        and currency = currency@pre
+context BankAccount::makeDeposit(amount:Integer):Boolean
+   post: balance = balance@pre + amount
+
+context BankAccount::makeWithdrawal(amount:Integer):Boolean
+ post: balance = balance@pre - amount
+       and currency = currency@pre
 
 --
 -- Class CurrencyTradingAccount
 -------------------------------
--- [Dresden] context CurrencyTradingAccount 
--- [Dresden]  inv:  currency <> tradingCurrency
+context CurrencyTradingAccount 
+ inv:  currency <> tradingCurrency
 
--- [Dresden] context CurrencyTradingAccount::getTradingCurrency()
--- [Dresden] post: result = tradingCurrency
+context CurrencyTradingAccount::getTradingCurrency()
+  post: result = tradingCurrency
 
--- [Dresden] context CurrencyTradingAccount::buy(amount:Integer)
--- [Dresden] pre:  amount > 0
--- [Dresden] post: balance = balance@pre + price * amount
+context CurrencyTradingAccount::buy(amount:Integer)
+  pre:  amount > 0
+  post: balance = balance@pre + price * amount
 
--- [Dresden] context CurrencyTradingAccount::sell(amount:Integer)
--- [Dresden]  pre:  amount > 0
--- [Dresden] post: balance = balance@pre - price * amount
+context CurrencyTradingAccount::sell(amount:Integer)
+ pre:  amount > 0
+ post: balance = balance@pre - price * amount
 
 --
 -- Class CreditAccount
 ----------------------
--- [Dresden] context CreditAccount 
--- [Dresden]  inv:  creditLimit <= 0
--- [Dresden]        and balance >= creditLimit
--- [Dresden]       and self.book->size() < 21
+context CreditAccount 
+  inv:  creditLimit <= 0
+        and balance >= creditLimit
+        and self.book->size() < 21
 
--- [Dresden] context CreditAccount::makeDeposit(amount:Integer):Boolean
--- [Dresden]  pre:  amount <= maxAmount  
--- [Dresden] post: if(creditLimit <= balance-amount) then
--- [Dresden]           balance = balance@pre - amount
--- [Dresden] 	    and
--- [Dresden]            result  = true
--- [Dresden]        else
--- [Dresden]            balance = balance@pre
--- [Dresden]          and
--- [Dresden] 	    result  = false
--- [Dresden]       endif
+context CreditAccount::makeDeposit(amount:Integer):Boolean
+  pre:  amount <= maxAmount  
+  post: if(creditLimit <= balance-amount) then
+           balance = balance@pre - amount
+	   and
+           result  = true
+        else
+           balance = balance@pre
+           and
+	   result  = false
+        endif
 
 --
 -- Class CheckBook
