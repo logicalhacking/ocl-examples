@@ -41,7 +41,7 @@ package simple
     inv meth2: self.m(self.i) > 5
     inv real: r = 2.45
     inv: not Set{1,2,3,4,5} ->isEmpty()
---    inv: Set{} ->isEmpty()
+    inv: Set{}->isEmpty()
 
 
   context B
@@ -54,26 +54,24 @@ package simple
 
   -- testing named self 
   -- ==================
-  -- not supported by dresden-ocl (parser-bug?)
-  -- ( Cannot parse OCL constraint: expecting: 'derive', 'init')
-  -- context foo:A 
-  --   inv named_self_short: i=5       -- Dresden 
-  --   inv named_self_foo:  foo.i=5    -- Dresden
+  context foo:A 
+    inv named_self_short: i=5  
+    inv named_self_foo:  foo.i=5 
 
   -- ->size() on non-collection types
   -- ================================
--- [Dresden] context A
--- [Dresden] inv: self.i->size() > 0 
+  context A
+    inv: self.i->size() > 0 
 
   -- implicit ->asSet()
   -- ==================
--- [Dresden]  context A
--- [Dresden]    inv setshort: self.i->size() > 0          
--- [Dresden]    inv set_long: self.i->asSet()->size() > 0  
--- [Dresden] inv intAsSet:    1->asSet()->includes(1)
--- [Dresden]     inv intInclude:  1->includes(1)
--- [Dresden]    inv intSizew:    1->size() > 0
--- [Dresden]    inv inc: self.i ->includes(4)         
+  context A
+    inv setshort: self.i->size() > 0          
+    inv set_long: self.i->asSet()->size() > 0  
+    inv intAsSet:    1->asSet()->includes(1)
+    inv intInclude:  1->includes(1)
+    inv intSizew:    1->size() > 0
+    inv inc: self.i ->includes(4)         
 
 
   -- Operations: pre/post
@@ -103,17 +101,17 @@ package simple
 
   -- shorthand for collect [omg:ocl:2003, p27]
   -- =========================================
-  -- context B
-    -- inv collect_short: self.a.i = Set{5}              -- Dresden
-    -- inv collect_long:  self.a ->collect(i) = Set{5}   -- Dresden
-    -- inv collect_test:  self.a.i = 5                   -- Dresden       
-    -- inv collect_test2:  self.a->collect(i) = 5         -- Dresden     
-    -- inv strange_collect: self.a->size() = 1 implies self.a.i=5  -- Dresden
+  context B
+    inv collect_short: self.a.i = Set{5}              
+    inv collect_long:  self.a ->collect(i) = Set{5}   
+    inv collect_test:  self.a.i = 5                          
+    inv collect_test2:  self.a->collect(i) = 5              
+    inv strange_collect: self.a->size() = 1 implies self.a.i=5  
 
   -- access to top-level path-expressions
   -- ====================================
-  -- context B               -- Dresden  
-  --  inv: simple::A.i = 5  -- Dresden	 
+  context B                 
+   inv: simple::A.i = 5  	 
 
   -- types of overloaded infix operations
   -- ====================================
@@ -127,9 +125,9 @@ package simple
   -- @pre for method calls
   -- =====================
   context A::m(p:Integer):Integer 
-    post: self.m(4)=5      -- Dresden
-    post: self@pre.m(4)=5  -- Dresden
-    post: self.m@pre(4)=5  -- Dresden
+    post: self.m(4)=5      
+    post: self@pre.m(4)=5  
+    post: self.m@pre(4)=5  
  
   -- body vs. post
   -- =============
@@ -138,8 +136,8 @@ package simple
 
   -- body (recursive)
   -- ================
-  -- context A::m(p:Integer):Integer -- Dresden/HOL-OCL
-  --   body: p * m(p-1)              -- Dresden/HOL-OCL
+  context A::m(p:Integer):Integer 
+    body: p * m(p-1)              
 
 
   -- init:
@@ -149,28 +147,25 @@ package simple
 
   -- def (attributes):
   -- =================
-  -- should be transformed into the UML model
-  -- context A                      
-  -- def: s:String=''               -- Dresden (HOL-OCL)
+  -- could be transformed into the UML model
+  context A                      
+    def: s:String=''               
 
   -- def (method):
   -- =================
-  -- should be transformed into the UML model
-  -- context A                 
-  -- def: fac(n:Integer):Integer = n fac(n-1)  -- Dresden (HOL-OCL)
+  context A                 
+    def: fac(n:Integer):Integer = n fac(n-1)  -- Dresden (HOL-OCL)
 
   -- derive:
   -- =======
-  -- (transformation into UML model)
-  -- (derive (attributes) ~~> invariants (class))?
-  -- context A.r
-  -- derive: i                      -- Dresden (HOL-OCL)
+  context A.r
+    derive: i                      -- Dresden (HOL-OCL)
      
 
   -- oclAsType (explicit overriding):
   -- ================================
-  -- context D
-  -- inv: self.oclAsType(A).r = 0  -- Dresden (HOL-OCL)
+  context D
+    inv: self.oclAsType(A).r = 0  -- Dresden (HOL-OCL)
 
 
   -- let expressions
@@ -186,7 +181,6 @@ package simple
     inv full: self.a->notEmpty()
     inv un: self.a->union(self.a) = self.a
     inv inter: self.a->intersection(self.a) = self.a 
-
 
 endpackage
   
