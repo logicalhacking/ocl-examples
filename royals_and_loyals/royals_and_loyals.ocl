@@ -55,31 +55,30 @@ context CustomerCard::valid : Boolean
 context CustomerCard 
   inv ofAge: owner.age >= 18
 
--- [ASTGen] Attribute must be classifier-scoped in this context
--- [ASTGen]  context CustomerCard 
--- [ASTGen]     inv THIS: let correctDate : Boolean = 
--- [ASTGen]    self.validFrom.isBefore(Date::now) and 
--- [ASTGen]    self.validThru.isAfter(Date::now) 
--- [ASTGen]   in 
--- [ASTGen]    if valid then 
--- [ASTGen]   correctDate = false 
--- [ASTGen]   else 
--- [ASTGen]    correctDate = true 
--- [ASTGen]    endif
+context CustomerCard 
+   inv THIS: let correctDate : Boolean = 
+  self.validFrom.isBefore(Date::now) and 
+  self.validThru.isAfter(Date::now) 
+ in 
+  if valid then 
+ correctDate = false 
+ else 
+  correctDate = true 
+  endif
 
--- [Def] context CustomerCard 
--- [Def]   def: CustomerCard::getTotalPoints( d: Date ) : Integer 
--- [Def]       = transactions->select( date.isAfter(d) ).points->sum()
+context CustomerCard 
+  def: CustomerCard::getTotalPoints( d: Date ) : Integer 
+       = transactions->select( date.isAfter(d) ).points->sum()
 
--- [ASTGen] context CustomerCard::transactions:Set(Transaction) 
--- [ASTGen]   init: Set{}
+context CustomerCard::transactions:Set(Transaction) 
+  init: Set{}
 
--- [ASTGen] Attribute must be classifier-scoped in this context
--- [ASTGen] context CustomerCard 
--- [ASTGen]   inv: validThru.isAfter( Date::now )
+Attribute must be classifier-scoped in this context
+context CustomerCard 
+  inv: validThru.isAfter( Date::now )
 
--- [ASTGen] context CustomerCard 
--- [ASTGen]   inv: self.owner.dateOfBirth.isBefore( Date::now )
+context CustomerCard 
+  inv: self.owner.dateOfBirth.isBefore( Date::now )
 
  context CustomerCard 
   inv: self.owner.programs->size() > 0
@@ -118,13 +117,13 @@ package RoyalLoyal
  context Customer::birthdayHappens() : void
    post: age = age@pre + 1
 
--- [Def] context Customer 
--- [Def]   def: wellUsedCards : Set( CustomerCard ) 
--- [Def]  	= cards->select( transactions.points->sum() > 10000 ) 
--- [Def]   def: loyalToCompanies : Bag( ProgramPartner ) 
--- [Def]   	= programs.partners 
--- [Def]  def: cardsForProgram(p: LoyaltyProgram) : Sequence(CustomerCard) 
--- [Def]  	= p.Membership.card
+context Customer 
+  def: wellUsedCards : Set( CustomerCard ) 
+ 	= cards->select( transactions.points->sum() > 10000 ) 
+  def: loyalToCompanies : Bag( ProgramPartner ) 
+  	= programs.partners 
+ def: cardsForProgram(p: LoyaltyProgram) : Sequence(CustomerCard) 
+      = p.Membership.card
     
   context Customer 
     inv: cards->select( c: CustomerCard| c.valid = true )->size() > 1
@@ -145,25 +144,23 @@ package RoyalLoyal
  context Customer 
     inv myInvariant: self.name = 'Mona'
 
--- [Def]  context Customer 
--- [Def]  def: initial : String = name.substring(1,1)
+context Customer 
+def: initial : String = name.substring(1,1)
 
--- Association Class:
--- [Enc/XMI] context Customer 
--- [Enc/XMI]   inv: Membership.account->select(a:LoyaltyAccount| a.points > 0 )
--- [Enc/XMI]         ->isEmpty()
+ context Customer 
+   inv: Membership.account->select(a:LoyaltyAccount| a.points > 0 )
+         ->isEmpty()
 
--- Association Class:
--- [Enc/XMI] context Customer 
--- [Enc/XMI]   inv: Membership.account->reject( not (points > 0) )->isEmpty() 
--- [Enc/XMI]   inv ANY: self.Membership.account->any( number < 10000 )->isEmpty()
+ context Customer 
+   inv: Membership.account->reject( not (points > 0) )->isEmpty() 
+   inv ANY: self.Membership.account->any( number < 10000 )->isEmpty()
 
--- [AstGen] context Customer
--- [AstGen] inv: self.programs->collect(lp: LoyaltyProgram | lp.partners) 
--- [AstGen]                   ->collectNested(deliveredServices )->isEmpty() 
+context Customer
+inv: self.programs->collect(lp: LoyaltyProgram | lp.partners) 
+                  ->collectNested(deliveredServices )->isEmpty() 
 
--- [Enc/XMI] context Customer
--- [Enc/XMI] inv:  Set{1,2,3}->iterate( i: Integer; sum: Integer = 0 | sum + i ) = 0
+ context Customer
+ inv:  Set{1,2,3}->iterate( i: Integer; sum: Integer = 0 | sum + i ) = 0
   
   context Customer 
     inv: programs->size() = cards->select( c: CustomerCard| c.valid = true )
@@ -182,8 +179,8 @@ context LoyaltyAccount::isEmpty(): Boolean
 context LoyaltyAccount::points : Integer 
   init: 0
 
--- [AstGen] context LoyaltyAccount::transactions : Set(Transaction) 
--- [AstGen]  init: Set{}
+context LoyaltyAccount::transactions : Set(Transaction) 
+ init: Set{}
 
  context LoyaltyAccount::getCustomerName() : String 
    body: Membership.card.owner.name
@@ -196,9 +193,9 @@ context LoyaltyAccount::points : Integer
 
 
 
--- [Derive] context LoyaltyAccount::totalPointsEarned : Integer 
--- [Derive]   derive: transactions->select( oclIsTypeOf( RoyalLoyal.Earning ) ) 
--- [Derive]   .points->sum()
+context LoyaltyAccount::totalPointsEarned : Integer 
+  derive: transactions->select( oclIsTypeOf( RoyalLoyal.Earning ) ) 
+  .points->sum()
 
 context LoyaltyAccount 
    inv Points: points > 0 
@@ -215,30 +212,30 @@ endpackage
 -- LoyaltyProgram
 ----------------------------------------------------------------------
 package RoyalLoyal
--- [returns_coll] context LoyaltyProgram::getServices(): Set(Service) 
--- [returns_coll]   body: partners.deliveredServices->asSet()
+context LoyaltyProgram::getServices(): Set(Service) 
+  body: partners.deliveredServices->asSet()
 
--- [returns_coll] context LoyaltyProgram::getServices(pp: ProgramPartner): Set(Service) 
--- [returns_coll]  body: if partners->includes(pp) 
--- [returns_coll] 	  then pp.deliveredServices 
--- [returns_coll]	  else Set{} 
--- [returns_coll] 	 	endif
+context LoyaltyProgram::getServices(pp: ProgramPartner): Set(Service) 
+ body: if partners->includes(pp) 
+	  then pp.deliveredServices 
+        else Set{} 
+	 	endif
 
--- [Def] context LoyaltyProgram 
--- [Def]  def: getServicesByLevel(levelName: String): Set(Service) 
--- [Def]  = levels->select( name = levelName ).availableServices->asSet()
+context LoyaltyProgram 
+ def: getServicesByLevel(levelName: String): Set(Service) 
+ = levels->select( name = levelName ).availableServices->asSet()
 
--- [Enc/XMI] context LoyaltyProgram 
--- [Enc/XMI] inv knownServiceLevel: levels->includesAll(Membership.currentLevel)
+context LoyaltyProgram 
+inv knownServiceLevel: levels->includesAll(Membership.currentLevel)
 
 context LoyaltyProgram 
   inv minServices: partners.deliveredServices ->size() >= 1
 
 
--- [Enc/XMI]  context LoyaltyProgram 
--- [Enc/XMI]    inv noAccounts: partners.deliveredServices->forAll( 
--- [Enc/XMI] 			  pointsEarned = 0 and pointsBurned = 0 ) 
--- [Enc/XMI] 				  implies Membership.account->isEmpty() 
+ context LoyaltyProgram 
+   inv noAccounts: partners.deliveredServices->forAll( 
+			  pointsEarned = 0 and pointsBurned = 0 ) 
+				  implies Membership.account->isEmpty() 
 
 
 context LoyaltyProgram 
@@ -252,50 +249,49 @@ context LoyaltyProgram
     post: participants = participants@pre->including( c ) 
 
 
---[Enc/XMI] context LoyaltyProgram::addTransaction( accNr: Integer, 
---[Enc/XMI]y 	pName: String, servId: Integer, amnt: Real, 
---[Enc/XMI] 	d: Date ) : Boolean
---[Enc/XMI]   post: let acc : LoyaltyAccount = 
---[Enc/XMI] 				  Membership.account->select( a | a.number = accNr )->any(true), 
- --[Enc/XMI]			newT : Transaction = 
---[Enc/XMI] 				  partners-> select(p | p.name = pName).deliveredServices 
---[Enc/XMI] 					  ->select(s | s.serviceNr = servId).transactions 
---[Enc/XMI] 						  ->select( date = d and amount = amnt )->any(true), 
---[Enc/XMI] 			card : CustomerCard = 
- --[Enc/XMI]				  Membership->select( m | m.account.number = accNr ).card->any(true)
---[Enc/XMI] 	    in acc.points = acc.points@pre + newT.points and 
---[Enc/XMI] 		   newT.oclIsNew() and 
- --[Enc/XMI]		   amnt = 0 implies newT.oclIsTypeOf( Burning ) and 
---[Enc/XMI] 		   amnt > 0 implies newT.oclIsTypeOf( Earning ) and 
- --[Enc/XMI]		   acc.transactions - acc.transactions@pre = Set{ newT } and 
---[Enc/XMI]		   card.transactions - card.transactions@pre = Set{ newT } 
+context LoyaltyProgram::addTransaction( accNr: Integer, 
+ 	pName: String, servId: Integer, amnt: Real, 
+	d: Date ) : Boolean
+  post: let acc : LoyaltyAccount = 
+				  Membership.account->select( a | a.number = accNr )->any(true), 
+			newT : Transaction = 
+				  partners-> select(p | p.name = pName).deliveredServices 
+					  ->select(s | s.serviceNr = servId).transactions 
+						  ->select( date = d and amount = amnt )->any(true), 
+			card : CustomerCard = 
+				  Membership->select( m | m.account.number = accNr ).card->any(true)
+	    in acc.points = acc.points@pre + newT.points and 
+		   newT.oclIsNew() and 
+		   amnt = 0 implies newT.oclIsTypeOf( Burning ) and 
+		   amnt > 0 implies newT.oclIsTypeOf( Earning ) and 
+		   acc.transactions - acc.transactions@pre = Set{ newT } and 
+		   card.transactions - card.transactions@pre = Set{ newT } 
  
--- [Def] context LoyaltyProgram 
--- [Def]   def: isSaving : Boolean = 
--- [Def] 	partners.deliveredServices->forAll(pointsEarned = 0)
+context LoyaltyProgram 
+  def: isSaving : Boolean = 
+	partners.deliveredServices->forAll(pointsEarned = 0)
 
--- [ASTGen] expected operation 'fromYMD inside Classifier Date to be a class operation (not instance level)
--- [ASTGen]  context LoyaltyProgram 
--- [ASTGen]   inv: partners.deliveredServices->forAll(s:Service| 
--- [ASTGen]                                           s.pointsEarned = 0) 
--- [ASTGen] 	   and 
--- [ASTGen] 	   Membership.card->forAll(c:CustomerCard| 
--- [ASTGen] 			c.validThru = Date::fromYMD(2000,1,1)) 
--- [ASTGen] 	   and 
--- [ASTGen] 	   participants->forAll(c:Customer| c.age_m() > 55)
+ context LoyaltyProgram 
+  inv: partners.deliveredServices->forAll(s:Service| 
+                                          s.pointsEarned = 0) 
+	   and 
+	   Membership.card->forAll(c:CustomerCard| 
+			c.validThru = Date::fromYMD(2000,1,1)) 
+	   and 
+	   participants->forAll(c:Customer| c.age_m() > 55)
 
   context LoyaltyProgram 
     inv: partners.deliveredServices->forAll(s: Service| 
                                    s.pointsEarned = 0) 
      inv: participants->forAll(p:Customer | p.age_m() > 55)
 
--- [Model] context LoyaltyProgram::selectPopularPartners( d: Date )
--- [Model]                                          : Set(ProgramPartner) 
--- [Model]   post: let popularTrans : Set(Transaction) = 
--- [Model]  			result.deliveredServices.transactions->asSet()
--- [Model] 		in 
--- [Model] 	  popularTrans->forAll( date.isAfter(d) ) and 
--- [Model] 	  popularTrans->select( amount > 500.00e1 )->size() > 20000
+context LoyaltyProgram::selectPopularPartners( d: Date )
+                                         : Set(ProgramPartner) 
+  post: let popularTrans : Set(Transaction) = 
+ 			result.deliveredServices.transactions->asSet()
+		in 
+	  popularTrans->forAll( date.isAfter(d) ) and 
+	  popularTrans->select( amount > 500.00e1 )->size() > 20000
 
 
  context LoyaltyProgram::enroll(c : Customer):Boolean 
@@ -304,34 +300,34 @@ context LoyaltyProgram
  context LoyaltyProgram::enroll(c : Customer):Boolean 
    post: participants = participants@pre->including(c)
 
--- [Enc/XMI] context LoyaltyProgram 
--- [Enc/XMI]   inv: levels->includesAll( Membership.currentLevel ) 
+context LoyaltyProgram 
+  inv: levels->includesAll( Membership.currentLevel ) 
 
   context LoyaltyProgram 
     inv: self.levels->exists(sl:ServiceLevel| sl.name = 'basic')
 
--- [Enc/XMI]   context LoyaltyProgram
--- [Enc/XMI]   inv testSET:  Set { 1 , 2 , 5 , 88 } ->isEmpty()
--- [Enc/XMI]     inv:  Set { 'apple' , 'orange', 'strawberry' } ->isEmpty()
--- [Enc/XMI]     inv:  Sequence { 1, 3, 45, 2, 3 } ->isEmpty()
--- [Enc/XMI]     inv:  Sequence { 'ape', 'nut' } ->isEmpty()
--- [Enc/XMI]     inv:  Bag {1 , 3 , 4, 3, 5 } ->isEmpty()
--- [Enc/XMI]     inv:  Sequence{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } ->isEmpty()
+  context LoyaltyProgram
+  inv testSET:  Set { 1 , 2 , 5 , 88 } ->isEmpty()
+    inv:  Set { 'apple' , 'orange', 'strawberry' } ->isEmpty()
+    inv:  Sequence { 1, 3, 45, 2, 3 } ->isEmpty()
+    inv:  Sequence { 'ape', 'nut' } ->isEmpty()
+    inv:  Bag {1 , 3 , 4, 3, 5 } ->isEmpty()
+    inv:  Sequence{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } ->isEmpty()
 
--- [Enc/XMI]  context LoyaltyProgram
--- [Enc/XMI]    inv:  Sequence{ 1..(6 + 4) } ->isEmpty()
--- [Enc/XMI]    inv:  Sequence{ 1..10 } ->isEmpty()
+ context LoyaltyProgram
+   inv:  Sequence{ 1..(6 + 4) } ->isEmpty()
+   inv:  Sequence{ 1..10 } ->isEmpty()
 
   context LoyaltyProgram 
     inv: self.participants->size() < 10000
 
--- [Enc/XMI] context LoyaltyProgram 
--- [Enc/XMI]   inv: self.Membership.account
--- [Enc/XMI]               ->isUnique( acc: LoyaltyAccount | acc.number )
+context LoyaltyProgram 
+  inv: self.Membership.account
+              ->isUnique( acc: LoyaltyAccount | acc.number )
 
--- [Def] context LoyaltyProgram 
--- [Def]   def: sortedAccounts : Sequence(LoyaltyAccount) = 
--- [Def]        self.Membership.account->sortedBy( number )
+context LoyaltyProgram 
+  def: sortedAccounts : Sequence(LoyaltyAccount) = 
+       self.Membership.account->sortedBy( number )
 
 context LoyaltyProgram 
   inv: participants->forAll( c:Customer | c.age_m() <= 70 )
@@ -345,8 +341,8 @@ context LoyaltyProgram
        self.participants->forAll( c2 : Customer | 
          c1 <> c2 implies c1.name <> c2.name ))
 
--- [Enc/XMI] context LoyaltyProgram 
--- [Enc/XMI]   inv: self.Membership.account->one( number < 10000 ) 
+context LoyaltyProgram 
+  inv: self.Membership.account->one( number < 10000 ) 
 
  context LoyaltyProgram::enroll(c : Customer):Boolean
   pre : not (participants->includes(c)) 
@@ -354,11 +350,11 @@ context LoyaltyProgram
  context LoyaltyProgram::enroll(c : Customer):Boolean
    post: participants = participants@pre->including(c) 
 
--- [Model-AssocClass]  context LoyaltyProgram::enroll(c : Customer):Boolean
--- [Model-AssocClass]   post: Membership->select(m : Membership | m.participants = c)-> 
--- [Model-AssocClass]         forAll( account->notEmpty() and 
--- [Model-AssocClass]          account.points = 0 and 
--- [Model-AssocClass]          account.transactions->isEmpty() )
+ context LoyaltyProgram::enroll(c : Customer):Boolean
+  post: Membership->select(m : Membership | m.participants = c)-> 
+        forAll( account->notEmpty() and 
+         account.points = 0 and 
+         account.transactions->isEmpty() )
 
 endpackage
 --
@@ -367,41 +363,41 @@ endpackage
 ----------------------------------------------------------------------
 package RoyalLoyal
 
--- [Model-AssocClass]  context Membership 
--- [Model-AssocClass]   inv correctCard: participants.cards->includes(self.card)
+context Membership 
+ inv correctCard: participants.cards->includes(self.card)
 
--- [Def] context Membership 
--- [Def]   def : getCurrentLevelName() : String = currentLevel.name
+context Membership 
+  def : getCurrentLevelName() : String = currentLevel.name
 
--- [Model-Enum] context Membership 
--- [Model-Enum]  inv levelAndColor: 
--- [Model-Enum]  currentLevel.name = 'Silver' implies card.color = Color::silver
--- [Model-Enum]  and 
--- [Model-Enum]  currentLevel.name = 'Gold' implies card.color = Color::gold
+context Membership 
+ inv levelAndColor: 
+ currentLevel.name = 'Silver' implies card.color = Color::silver
+ and 
+ currentLevel.name = 'Gold' implies card.color = Color::gold
 
--- [Model-AssocClass] context Membership 
--- [Model-AssocClass]  inv noEarnings: programs.partners.deliveredServices 
--- [Model-AssocClass]               ->forAll(pointsEarned = 0) implies account
--- [Model-AssocClass]                            ->isEmpty()
+context Membership 
+ inv noEarnings: programs.partners.deliveredServices 
+              ->forAll(pointsEarned = 0) implies account
+                           ->isEmpty()
 
--- [Model-AssocClass] context Membership 
--- [Model-AssocClass]  inv noEarnings2: programs.isSaving 
--- [Model-AssocClass]      implies account->isEmpty()
+context Membership 
+ inv noEarnings2: programs.isSaving 
+     implies account->isEmpty()
 
  context Membership 
    inv: account.points >= 0 or account->isEmpty()
 
--- [Model-AssocClass] context Membership 
--- [Model-AssocClass]   inv: participants.cards.Membership->includes( self )
+context Membership 
+  inv: participants.cards.Membership->includes( self )
 
--- [Model-AssocClass] context Membership 
--- [Model-AssocClass] inv: programs.levels->includes( currentLevel )
+context Membership 
+inv: programs.levels->includes( currentLevel )
 
  context Membership 
   inv: account->isEmpty() 
 
---  [Model-AssocClass] context Membership 
---  [Model-AssocClass]  inv: programs.levels ->includes(currentLevel)
+context Membership 
+ inv: programs.levels ->includes(currentLevel)
 
 endpackage
 --
@@ -444,17 +440,17 @@ context ProgramPartner
      inv: self.programs.partners->select(p : ProgramPartner | p <> self)
              ->isEmpty()
 
--- [Def] context ProgramPartner 
--- [Def]   def: getBurningTransactions(): Set(Transaction) = 
--- [Def]   self.deliveredServices.transactions->iterate( 
--- [Def] 				  t : Transaction; 
--- [Def] 				  resultSet : Set(Transaction) = Set{} | 
--- [Def] 					  if t.oclIsTypeOf( RoyalLoyal.Burning ) then 
--- [Def] 					  	resultSet->including( t ) 
--- [Def] 					  else 
--- [Def] 					  	resultSet 
--- [Def] 					  endif 
--- [Def]				  )
+context ProgramPartner 
+  def: getBurningTransactions(): Set(Transaction) = 
+  self.deliveredServices.transactions->iterate( 
+				  t : Transaction; 
+				  resultSet : Set(Transaction) = Set{} | 
+					  if t.oclIsTypeOf( RoyalLoyal.Burning ) then 
+					  	resultSet->including( t ) 
+					  else 
+					  	resultSet 
+					  endif 
+       			  )
 
 endpackage
 --
@@ -465,31 +461,30 @@ package RoyalLoyal
 
 context ServiceLevel 
  inv: program.partners ->isEmpty()
--- [AstGen]  inv: Set { Set { 1, 2 }, Set { 2, 3 }, Set { 14, 5, 6 } } ->isEmpty()
--- [Enc/XMI]   inv: Set { 1, 2, 3, 4, 5, 6 } ->isEmpty()
--- [AstGen]  inv: Bag { Set { 1, 2 }, Set { 1, 2 }, Set { 4, 5, 6 } } ->isEmpty()
--- [Enc/XMI]   inv:  Bag { 1, 1, 2, 2, 4, 5, 6 } ->isEmpty()
--- [AstGen]  inv: Sequence { Set { 1, 2 }, Set { 2, 3 }, Set { 4, 5, 6 } } ->isEmpty()
--- [Enc/XMI]   inv: Sequence { 2, 1, 2, 3, 5, 6, 4 } ->isEmpty()
--- [Enc/XMI]   inv: Set{1,4,7,10} - Set{4,7} = Set{1,10} 
--- [Enc/XMI]   inv: Set{1,4,7,10}->symmetricDifference(Set{4,5,7}) = Set{1,5,10} 
--- [Enc/XMI]   inv: Sequence{'a','b','c','c','d','e'}->first() = 'a' 
--- [Enc/XMI]   inv: Sequence{'a','b','c','c','d','e'}->at( 3 ) = 'c' 
--- [Enc/XMI]   inv: Sequence{'a','b','c','c','d','e'}->indexOf( 'c' ) = 3 
--- [Enc/XMI]   inv: Sequence{'a','b','c','c','d','e'}->subSequence( 3, 5 ) = 
--- [Enc/XMI] 	Sequence{'c','c','d'} 
--- [Enc/XMI]   inv: Sequence{'a','b','c','c','d','e'}->append( 'X' ) = 
--- [Enc/XMI] 			Sequence{'a','b','c','c','d','e','X'} 
--- [Enc/XMI]   inv: Sequence{'a','b','c','c','d','e'}->prepend( 'X' ) = 
--- [Enc/XMI] 			Sequence{'X','a','b','c','c','d','e'}
---
--- Dresden-OCL does not implement OrderedSets ...
--- [OrderedSet] inv: OrderedSet{12,9,6,3} - Set{1,3,2} = OrderedSet{12,9,6} 
--- [OrderedSet] inv: OrderedSet{'a','b','c','d'}->last() = 'd' 
--- [OrderedSet] inv: OrderedSet{'a','b','c','d'}->insertAt( 3, 'X' ) = 
--- [OrderedSet]  					       OrderedSet{'a','b','X','c','d'} 
--- [OrderedSet] inv: OrderedSet{'a','b','c','d'}->subOrderedSet( 2, 3 ) = 
--- [OrderedSet] 			OrderedSet{'b','c'} 
+inv: Set { Set { 1, 2 }, Set { 2, 3 }, Set { 14, 5, 6 } } ->isEmpty()
+  inv: Set { 1, 2, 3, 4, 5, 6 } ->isEmpty()
+inv: Bag { Set { 1, 2 }, Set { 1, 2 }, Set { 4, 5, 6 } } ->isEmpty()
+  inv:  Bag { 1, 1, 2, 2, 4, 5, 6 } ->isEmpty()
+inv: Sequence { Set { 1, 2 }, Set { 2, 3 }, Set { 4, 5, 6 } } ->isEmpty()
+  inv: Sequence { 2, 1, 2, 3, 5, 6, 4 } ->isEmpty()
+  inv: Set{1,4,7,10} - Set{4,7} = Set{1,10} 
+  inv: Set{1,4,7,10}->symmetricDifference(Set{4,5,7}) = Set{1,5,10} 
+  inv: Sequence{'a','b','c','c','d','e'}->first() = 'a' 
+  inv: Sequence{'a','b','c','c','d','e'}->at( 3 ) = 'c' 
+  inv: Sequence{'a','b','c','c','d','e'}->indexOf( 'c' ) = 3 
+  inv: Sequence{'a','b','c','c','d','e'}->subSequence( 3, 5 ) = 
+	Sequence{'c','c','d'} 
+  inv: Sequence{'a','b','c','c','d','e'}->append( 'X' ) = 
+			Sequence{'a','b','c','c','d','e','X'} 
+  inv: Sequence{'a','b','c','c','d','e'}->prepend( 'X' ) = 
+			Sequence{'X','a','b','c','c','d','e'}
+
+et{12,9,6,3} - Set{1,3,2} = OrderedSet{12,9,6} 
+inv: OrderedSet{'a','b','c','d'}->last() = 'd' 
+inv: OrderedSet{'a','b','c','d'}->insertAt( 3, 'X' ) = 
+ 					       OrderedSet{'a','b','X','c','d'} 
+inv: OrderedSet{'a','b','c','d'}->subOrderedSet( 2, 3 ) = 
+			OrderedSet{'b','c'} 
 endpackage
 --
 ----------------------------------------------------------------------
@@ -533,8 +528,8 @@ endpackage
 package RoyalLoyal
 
 -- Navigation over path expressions/association class
--- [Model-AssocClass] context Transaction::program() : LoyaltyProgram 
--- [Model-AssocClass]   post: result = self.card.membership.programs
+context Transaction::program() : LoyaltyProgram 
+  post: result = self.card.membership.programs
 
   context Transaction 
     inv: self.oclIsKindOf(RoyalLoyal.Transaction) = true 
