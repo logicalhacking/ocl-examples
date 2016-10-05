@@ -34,18 +34,18 @@ package AbstractSimpleChair04
         self.participants->one( p:Participant | 
                                        p.role.oclIsTypeOf(AbstractSimpleChair04.Chair))
 
--- --   context Session::invite(p:Person, r:Role):OclVoid
--- --     pre:  not self.participants->forAll(participant:Participant |
--- --                                participant.person <> p and 
--- --                                participant.role <> r)
--- --     post: self.participants->one(participant:Participant |
--- --                                   participant.person=p and 
--- --                                   participant.role=r)
+  context Session::invite(p:Person, r:Role):OclVoid
+    pre:  not self.participants->forAll(participant:Participant |
+                               participant.person <> p and 
+                               participant.role <> r)
+    post: self.participants->one(participant:Participant |
+                                  participant.person=p and 
+                                  participant.role=r)
 
   context Session::findRole(p:Person):Role
     pre:  self.participants->collect(par:Participant | par.person)->includes(p)
---     post: result=self.participants->select(par:Participant |
---                                        par.person->includes(p) ).role 
+    post: result=self.participants->select(par:Participant |
+                                           par.person->includes(p) ).role 
 
   -- constraints describing the semantics of an association class
   -- in terms of a ternary association:

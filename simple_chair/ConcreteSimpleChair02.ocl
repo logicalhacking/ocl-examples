@@ -45,16 +45,12 @@ package ConcreteSimpleChair02
   context Session
     inv: participants.size() = roles.size()
 
-  -- constraints describing the semantics of associations in 
-  -- terms of attributes
-  -- - SessionRole 
   context Session 
     inv:  self.roles->forAll(r:Role | r.sessions->includes(self))
 
   context Role
     inv:  self.sessions->forAll(s:Session | s.roles->includes(self))
 
-  -- - SessionPersion
   context Session
     inv:  self.participants->forAll(p:Person | p.sessions->includes(self))
    context Person
