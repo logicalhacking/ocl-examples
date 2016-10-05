@@ -35,15 +35,15 @@ package Vehicles
       self.truck->forAll( t:Truck | self.isAllowedToDriveTruck( 
            self.driversLicense.licenseClass, t.oclAsType(Vehicles.Vehicle).tons))
 
--- context Person
---  inv FeatureOfLicenseClassCE:
---    Truck::allInstances()->forAll( t : Truck |
---      self.isAllowedToDriveTruck( 'CE', t.tons ) )
+  context Person
+   inv FeatureOfLicenseClassCE:
+     Truck::allInstances()->forAll( t : Truck |
+       self.isAllowedToDriveTruck( 'CE', t.tons ) )
 
--- context Person
---  inv NoPersonMoreThan18Points:
---    self.ticket->iterate( t : Ticket ; sum : Integer = 0 |
---      sum + t.points ) <= 18
+  context Person
+   inv NoPersonMoreThan18Points:
+     self.ticket->iterate( t : Ticket ; sum : Integer = 0 |
+       sum + t.points ) <= 18
 
   context 
    Person::isAllowedToDriveTruck(licenseClass:String, tons:Real):Boolean
