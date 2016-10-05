@@ -154,19 +154,18 @@ package simple
   -- def (method):
   -- =================
   context A                 
-    def: fac(n:Integer):Integer = n fac(n-1)  -- Dresden (HOL-OCL)
+    def: fac(n:Integer):Integer = n fac(n-1)  
 
   -- derive:
   -- =======
   context A.r
-    derive: i                      -- Dresden (HOL-OCL)
+    derive: i                      
      
 
   -- oclAsType (explicit overriding):
   -- ================================
   context D
-    inv: self.oclAsType(A).r = 0  -- Dresden (HOL-OCL)
-
+    inv: self.oclAsType(A).r = 0  
 
   -- let expressions
   -- ===============
