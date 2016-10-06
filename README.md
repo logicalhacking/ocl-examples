@@ -1,8 +1,7 @@
 # ocl-examples
-A collection of (toy) examples using OCL that demonstrate the use of
-OCL in the context of UML as well as SecureUML models. Most of the
-models were developed in the context of the HOL-OCL and SecureUML 
-projects.
+A collection of (toy) examples that demonstrate the use of OCL in 
+the context of UML as well as SecureUML models. Most of the models 
+were developed in the context of the HOL-OCL and SecureUML projects.
 
 ## Models
 * **[Controller Calendar:](./controller_calendar)** A simple calendar/meeting model using ControllerUML.
