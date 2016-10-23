@@ -12,13 +12,13 @@ were developed in the context of the HOL-OCL and SecureUML projects.
 * **[Health System:](./health_system)** A simple health system.
 * **[Invoicing Orders:](./invoicing_orders)** A simple invoicing model.
 * **[ISP:](./isp)** A simple example of an ISP.
-* **[Mini Company:](./mini_company)** A tiny company example modelling a management hierarchy.
+* **[Mini Company:](./mini_company)** A tiny company example modeling a management hierarchy.
 * **[Priority Queue:](./priority_queue)** A simple priority queue model.
 * **[Red-Black Tree:](./rbt)** A UML/OCL model of red-black trees.
 * **[Royals and Loyals:](./royals_and_loyals)** The famous royals-and-loyals example.
 * **[Simple:](./simple)** A very simple toy example showing a few OCL syntax variations.
 * **[Simple Chair:](./simple_chair)** A simple conference management system.
-* **[Simple Filesystem:](./simple_filesystem)** A simple POSIX-like fileystem model.
+* **[Simple Filesystem:](./simple_filesystem)** A simple POSIX-like file system model.
 * **[Stack:](./stack)** A simple stack.
 * **[Vehicles:](./vehicles)** A simple model of vehicles and driver's licenses.
 
