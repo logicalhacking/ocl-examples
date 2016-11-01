@@ -46,8 +46,8 @@ package RoyalLoyal
 context CustomerCard::valid : Boolean
  init: true                             
 
--- [Derive] context CustomerCard::printedName : String
--- [Derive]   derive: owner.title.concat(' ').concat(owner.name)
+context CustomerCard::printedName : String
+ derive: owner.title.concat(' ').concat(owner.name)
 
  context CustomerCard 
    inv checkDates: validFrom.isBefore(validThru)
