@@ -75,13 +75,13 @@ package simple
 
 
   -- Operations: pre/post
-  -- ==============================
+  -- ====================
   context A::m(p:Integer):Integer
     pre: p > 0 
     post: (result = 0 - p)   and  p > (0-5)
 
-  -- Operations: @per
-  -- ==============================
+  -- Operations: @pre
+  -- ================
   context A::m(p:Integer):Integer                
     post pre1: self = self@pre                     
     post pre2: p = i@pre - 5                       
@@ -152,7 +152,7 @@ package simple
     def: s:String=''               
 
   -- def (method):
-  -- =================
+  -- =============
   context A                 
     def: fac(n:Integer):Integer = n fac(n-1)  
 
