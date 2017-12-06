@@ -28,6 +28,8 @@ were developed in the context of the HOL-OCL and SecureUML projects.
 ## License
 This project is licensed under a 2-clause BSD license. 
 
+SPDX-License-Identifier: BSD-2-Clause
+
 ## Publications
 * Achim D. Brucker and Burkhart Wolff. [Semantics, Calculi, and Analysis
   for Object-oriented Specifications.](https://www.brucker.ch/bibliography/download/2009/brucker.ea-semantics-2009.pdf)
