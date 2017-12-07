@@ -30,6 +30,12 @@ This project is licensed under a 2-clause BSD license.
 
 SPDX-License-Identifier: BSD-2-Clause
 
+## Master Repository
+
+The master git repository for this project is hosted by the [Software
+Assurance & Security Research Team](https://logicalhacking.com):
+<https://git.logicalhacking.com/HOL-OCL/ocl-examples>.
+
 ## Publications
 * Achim D. Brucker and Burkhart Wolff. [Semantics, Calculi, and Analysis
   for Object-oriented Specifications.](https://www.brucker.ch/bibliography/download/2009/brucker.ea-semantics-2009.pdf)
